@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas Touch Move</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+        }
+    </style>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="360" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        const circles = [
+            { x: 100, y: 100, radius: 7, color: "#ABD", text: "Pravda (hranice to / ne-to)" },
+            { x: 200, y: 200, radius: 5, color: "#87D", text: "Dobro" },
+            { x: 300, y: 100, radius: 3, color: "#12E", text: "Krása" }
+        ];
+
+        let selectedCircle = null;
+
+        // Add text around the circle
+        //ctx.font = "16px Arial";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        /*
+        const radius = 89;
+        const angleStep = (Math.PI * 2) / text.length;
+        const startAngle = Math.PI;
+        const endAngle = 2 * Math.PI;
+        */
+/*
+        for (let i = 0; i < text.length; i++) {
+            //const angle = i * angleStep;
+            const angle = startAngle + (i / text.length) * (endAngle - startAngle);
+            const x = 200 + radius * Math.cos(angle);
+            const y = 200 + radius * Math.sin(angle);
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(angle + Math.PI / 2);
+            ctx.fillText(text[i], 0, 0);
+            ctx.restore();
+        }
+        */
+        const order = [ 3, 5, 7, 9 ]
+
+        function countOfLetter( radius ){
+
+            result = 7;
+
+
+            for ( i = 0; order[i] <= radius; i++ ) {
+
+                result = result + order[i];             
+
+            }
+            
+            return ( result * 2 )
+        }
+
+
+        function drawCircles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            circles.forEach(circle => {
+                ctx.beginPath();
+
+                // 3,5,7,9 are available values
+                // radius for circle
+                radiusCircle = circle.radius * 10;
+                ctx.arc(circle.x, circle.y, radiusCircle, 0, 2 * Math.PI);
+                ctx.fillStyle = circle.color;
+                ctx.fill();
+                ctx.stroke();
+
+                // text placement
+                // radius for text
+                const radiusText = radiusCircle - 10;
+                //const angleStep = (Math.PI * 2) / circle.text.length;
+
+                countOfLetters = countOfLetter( circle.radius );
+                //console.log(circle.radius + " - pocet pismen: " + countOfLetters);
+                const angleStep = (Math.PI * 2) / countOfLetters;
+
+                //const startAngle = Math.PI;
+                //const endAngle = 2 * Math.PI;
+
+                fuga = ((( countOfLetters / 2 ) - circle.text.length ) /2 ) /  ( countOfLetters / 2 )  * Math.PI
+
+                //console.log( "fuga: " + fuga );
+
+                const startAngle = Math.PI + fuga + ( angleStep / 2 );
+                const endAngle = ( 2 * Math.PI ) - fuga;
+
+                textSize = 10 + circle.radius - 1;
+                ctx.font = textSize + "px Times";
+
+                for (let i = 0; i < circle.text.length; i++) {
+                    //const angle = i * angleStep;
+                    const angle = startAngle + (i / circle.text.length) * (endAngle - startAngle);
+                    const x = circle.x + radiusText * Math.cos(angle);
+                    const y = circle.y + radiusText * Math.sin(angle);
+                    ctx.save();
+                    ctx.translate(x, y);
+                    ctx.rotate(angle + Math.PI / 2);
+                    ctx.fillStyle = 'black';
+                    ctx.fillText(circle.text[i], 0, 0);
+                    ctx.restore();
+                }
+
+            });
+
+            //console.log( "end drawing" );
+        }
+
+        function getTouchPos(canvas, event) {
+
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: event.touches ? event.touches[0].clientX - rect.left : event.clientX - rect.left,
+                y: event.touches ? event.touches[0].clientY - rect.top : event.clientY - rect.top 
+            };
+        }
+
+
+        function handleStart( e ){
+            
+            //console.log( 'starting move ...' );
+            const touchPos = getTouchPos(canvas, e);
+            selectedCircle = circles.find(circle =>
+                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( circle.radius * 10 )
+            );
+
+        }
+
+        function handleMove( e ){
+
+            //console.log( ' ... moving ...' );
+            if (selectedCircle) {
+                const touchPos = getTouchPos(canvas, e);
+                selectedCircle.x = touchPos.x;
+                selectedCircle.y = touchPos.y;
+                drawCircles();
+            }
+
+        }
+
+        function handleEnd(){
+
+            //console.log( '... end moving' );
+
+            selectedCircle = null;
+
+        }
+
+        canvas.addEventListener('touchstart', handleStart );
+        canvas.addEventListener('mousedown', handleStart );
+
+        canvas.addEventListener('touchmove', handleMove );
+        canvas.addEventListener('mousemove', handleMove );
+
+        canvas.addEventListener('touchend', handleEnd );
+        canvas.addEventListener('mouseup', handleEnd );
+
+/*
+        canvas.addEventListener('touchstart', (e) => {
+            const touchPos = getTouchPos(canvas, e);
+            selectedCircle = circles.find(circle =>
+                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < circle.radius
+            );
+        });
+*/
+
+/*
+        canvas.addEventListener('touchmove', (e) => {
+            if (selectedCircle) {
+                const touchPos = getTouchPos(canvas, e);
+                selectedCircle.x = touchPos.x;
+                selectedCircle.y = touchPos.y;
+                drawCircles();
+            }
+        });
+*/
+
+/*
+        canvas.addEventListener('touchend', () => {
+            selectedCircle = null;
+        });
+*/
+
+        drawCircles();
+
+    </script>
+</body>
+
+</html>
