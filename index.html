@@ -19,9 +19,9 @@
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
         const circles = [
-            { x: 100, y: 100, radius: 7, color: "#ABD", text: "Pravda (hranice to / ne-to)" },
-            { x: 200, y: 200, radius: 5, color: "#87D", text: "Dobro" },
-            { x: 300, y: 100, radius: 3, color: "#12E", text: "Krása" }
+            { x: 100, y: 100, radius: 9, color: "#ABD", text: "Pravda (hranice to/ne-to)" },
+            { x: 200, y: 200, radius: 7, color: "#87D", text: "Dobro" },
+            { x: 300, y: 100, radius: 5, color: "#12E", text: "Krása" }
         ];
 
         let selectedCircle = null;
@@ -66,6 +66,8 @@
             return ( result * 2 )
         }
 
+        let lastSelectedIndex = 0
+        let endMove = false
 
         function drawCircles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -78,6 +80,18 @@
                 ctx.arc(circle.x, circle.y, radiusCircle, 0, 2 * Math.PI);
                 ctx.fillStyle = circle.color;
                 ctx.fill();
+
+                if ( selectedCircle === circle ){
+                    //console.log("selected " + selectedCircle)
+
+                    ctx.strokeStyle = 'yellow'; // Set border color to yellow
+                    ctx.lineWidth = 3; // Set border width to 3px
+
+                } else {
+                    ctx.strokeStyle = 'black'; // Set border color to yellow
+                    ctx.lineWidth = 1; // Set border width to 3px
+                }
+
                 ctx.stroke();
 
                 // text placement
@@ -104,7 +118,17 @@
 
                 for (let i = 0; i < circle.text.length; i++) {
                     //const angle = i * angleStep;
-                    const angle = startAngle + (i / circle.text.length) * (endAngle - startAngle);
+                    var angle = startAngle + (i / circle.text.length) * (endAngle - startAngle);
+                    let charList1 = [ 'D', 'K' ]
+                    if ( charList1.includes( circle.text[i].toUpperCase() ) ){
+                        angle = angle - 0.03 
+                    }
+                    /*
+                    let charList2 = [ 'i', 'j' ]
+                    if ( charList2.includes(circle.text[i])  ){
+                        angle = angle + 0.02 
+                    }
+                    */
                     const x = circle.x + radiusText * Math.cos(angle);
                     const y = circle.y + radiusText * Math.sin(angle);
                     ctx.save();
@@ -130,20 +154,50 @@
         }
 
 
+        let runStart = 0
+
         function handleStart( e ){
             
-            //console.log( 'starting move ...' );
+            //console.log( 'starting move ... ' + selectedCircle );
             const touchPos = getTouchPos(canvas, e);
-            selectedCircle = circles.find(circle =>
-                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( circle.radius * 10 )
+/*
+            circles.forEach( (circle) => {
+                if ( circle === selectedCircle ){
+                    console.log( "circle selected match" )
+                } else {
+                    console.log( " NOT circle selected match" )
+                }
+             })
+                */
+
+            let previousSelected = selectedCircle   
+            selectedCircle = circles.filter( (circle, index) => selectedCircle != circle && index >= lastSelectedIndex ).find(circle =>
+                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( circle.radius * 10 )                            
             );
 
+
+            if ( selectedCircle === undefined ){
+
+                selectedCircle = circles.find(circle =>
+                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( circle.radius * 10 )                            
+            );} 
+
+            //console.log( 'starting move TO_MOVE ... ' + selectedCircle );
+            endMove = false
+            if ( selectedCircle ) {
+                lastSelectedIndex = circles.indexOf( selectedCircle )
+                if ( lastSelectedIndex == circles.length - 1){
+                    lastSelectedIndex = 0
+                }
+                //console.log( '  last selected index: ' + lastSelectedIndex );
+            }
+            drawCircles()
         }
 
         function handleMove( e ){
 
             //console.log( ' ... moving ...' );
-            if (selectedCircle) {
+            if (selectedCircle && !endMove) {
                 const touchPos = getTouchPos(canvas, e);
                 selectedCircle.x = touchPos.x;
                 selectedCircle.y = touchPos.y;
@@ -156,7 +210,12 @@
 
             //console.log( '... end moving' );
 
-            selectedCircle = null;
+            endMove = true
+            //selectedCircle = null;
+
+
+            //drawCircles()
+
 
         }
 
