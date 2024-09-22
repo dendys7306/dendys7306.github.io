@@ -181,6 +181,7 @@
                 ctx.beginPath();
 
                 radiusCircle = getRadiusInPixel(circle.radius)
+                //console.log( "CIRCLE: " + circle.id + " -> " + circle.x + "  " + circle.y )
                 ctx.arc(circle.x, circle.y, radiusCircle, 0, 2 * Math.PI);
                 ctx.fillStyle = circle.color;
 
@@ -274,6 +275,10 @@
             };
         }
 
+
+        let startPos = null
+        let startVector = null
+
         /* handle start event */
         function handleStart( e ){
 
@@ -284,7 +289,10 @@
        
             //console.log( 'starting move ... ' + selectedCircle );
             const touchPos = getTouchPos(canvas, e);
-            
+            startPos = touchPos
+            //console.log( "START: " + touchPos.x + "  " + touchPos.y )
+
+
             let working = false
 
             selectedCircle = circles.sort( ( a, b ) => b.id - a.id). 
@@ -319,6 +327,8 @@
             endMove = false
         }
 
+        const hasSpecificValue = (arr, key, value) => arr.some(obj => obj[key] === value);
+
         /* handling move of circles especially those they are selected */
         function handleMove( e ){
 
@@ -330,14 +340,37 @@
                 return
             }
 
+            /* if no select circle do nothing*/
+            if ( !hasSpecificValue( circles, 'selected', true ) ){
+                //console. log( 'DO nothing by move, no selection' )
+                return 
+            }
+
+
             const touchPos = getTouchPos(canvas, e);
+            
+
+            /* check for significant move */
+            threshold = 10
+            if ( !moved && startPos !== null &&
+                 Math.abs( startPos.x - touchPos.x ) < threshold &&
+                 Math.abs( startPos.y - touchPos.y ) < threshold ) {
+                return
+            }
 
             circles.forEach( circle => {
 
                 //const touchPos = getTouchPos(canvas, e);
                 if ( circle.selected ) {
-                    circle.x = touchPos.x;
-                    circle.y = touchPos.y;
+                    //console.log( "MOVE: " + touchPos.x + "  " + touchPos.y + "  startPod: " + startPos.x + " " + startPos.y + "  circle: " + circle.x + " " + circle.y )
+
+                    if ( startVector === null ) {
+                        startVector = { x: circle.x - startPos.x, y: circle.y - startPos.y }
+                    }
+
+                    circle.x = touchPos.x + startVector.x;
+                    circle.y = touchPos.y + startVector.y;
+                    //console.log( "MOVE: " + touchPos.x + "  " + touchPos.y + "  circle: " + circle.x + " " + circle.y )
 
                     // setting moved to be active
                     moved = true
@@ -345,7 +378,9 @@
             })
 
             // draw circles by every move
-            drawCircles();   
+            if ( moved ) {
+                drawCircles();
+            }   
 
         }
 
@@ -373,6 +408,8 @@
 
                 // moving attribute switch of
                 moved = false
+
+                startVector = null
             }
 
             //drawCircles()
