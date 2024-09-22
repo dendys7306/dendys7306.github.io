@@ -278,9 +278,21 @@
 
         let startPos = null
         let startVector = null
+        let isTouched = false;
 
         /* handle start event */
         function handleStart( e ){
+
+            // prevent quick doubletouch
+            if (isTouched) {
+                e.preventDefault();
+                return false;
+            }
+            isTouched = true;
+            setTimeout(() => {
+                isTouched = false;
+            }, 200);  // Adjust the timeout as needed
+
 
             // do nothing when move is active
             if ( moved ){
@@ -314,8 +326,15 @@
 
                 if ( circles.find( circle => Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) ) ) !== undefined ) {
                     selecting = !selecting
+
                 } else {
                     selecting = true
+
+                    // deselcting all selected for mobile
+                    circles.forEach(circle => {
+                        circle.selected = false; // Nová hodnota
+                    });
+                    
                 }   
                 //console.log("switched selecting to: " + selecting)
             }
