@@ -30,15 +30,33 @@
         const ctx = canvas.getContext('2d');
         let circles = []
 
-        // todo multiple selection this mark should be in the array
-        let selectedCircle = null;
-
-        // Add text around the circle
+        // text general properties
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
 
+        /* is dark color to switch font ... */
+        function isColorDark(color) {
+
+            // expand three char hex to six
+            if ( color.length === 4 ) {
+                color = '#' + color[1] + color[1] + color[2] + color[2] + color[3] + color[3];
+            }
+            
+            // Convert hex color to RGB
+            let r = parseInt(color.substr(1, 2), 16);
+            let g = parseInt(color.substr(3, 2), 16);
+            let b = parseInt(color.substr(5, 2), 16);
+
+            // Calculate luminance
+            let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+
+            // Return true if the color is dark, false otherwise
+            return luminance < 128;
+        }        
+
         /* parsing data */
         function parseData() {
+            
             // Get the input data
             const inputData = document.getElementById('inputData').value;
             
@@ -52,8 +70,10 @@
 
                 const match = line.match(regex);
 
-                /* if id exists */
-                const index = circles.findIndex(circles => circles.id === match[1]);
+                //console.log( "preparing line with id: " + parseInt(match[1]) )
+
+                // entry with given id exists
+                const index = circles.findIndex(circles => circles.id === parseInt(match[1]));
 
                 if (index !== -1) {
 
@@ -80,7 +100,8 @@
                     const circle = {
                         x: canvas.width / 2,
                         y: canvas.height / 2, 
-                        id: match[1].trim(),                   // 1x - id  
+                        selected : false,
+                        id: parseInt(match[1]),                // 1x - id  
                         radius: parseInt(match[2]),            // 1x - radius  
                         color: '#' + match[3].trim(),          // 3x - color in hex
                         transparent : parseInt(match[4]),      // 1x - transparent
@@ -92,13 +113,14 @@
                 }
             });
             
-            // Log the array of circles to the console
+            //console.log(circles);
+            //circles.sort( (a,b) => a.id - b.id );
             //console.log(circles);
 
             drawCircles();
         }
 
-        /* handling canvas */
+        /* count letter ofr the whole circle depending on radius (1-9) */
         function countOfLetter( radius ){
 
             let output = 9;
@@ -118,23 +140,44 @@
             return output
         }
 
+        /* calculate radius in pixels for given 1 .. 9 */
         function getRadiusInPixel(radius){
             return 10 + ((radius-1) * 20)
         }
 
+        /* funkce s exponentem */
         function exponentialFunction(x) {
             const a = 3; // základ exponenciální funkce
             const k = 0.31; // konstanta určující míru růstu
             return Math.pow(a, k * x);
         }
 
+        /* canvas zoom */
+        function zoomCanvas(scaleFactor) {
+            ctx.save(); // Save the current state
+            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
 
-        let lastSelectedIndex = 0
+            //canvas.width *= scaleFactor;
+            //canvas.height *= scaleFactor;
+
+            ctx.scale(scaleFactor, scaleFactor); // Scale the canvas
+            // Redraw your content here
+            drawCircles()
+
+            ctx.restore(); // Restore the original state
+        }        
+
+        /* handling selection variables */
         let endMove = false
+        let moved = false
+        let selecting = true
 
+        /* draw circles function */ 
         function drawCircles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // order ascending - may be do it better way not to sort every draw
             circles.sort( (a, b) => a.id - b.id ).forEach(circle => {               
+            //circles.forEach(circle => {               
                 ctx.beginPath();
 
                 radiusCircle = getRadiusInPixel(circle.radius)
@@ -144,14 +187,19 @@
                 ctx.globalAlpha = circle.transparent / 10;
                 ctx.fill();
 
-                if ( selectedCircle === circle ){
-                    //console.log("selected " + selectedCircle)
+                if ( circle.selected ){
+                    //console.log("selected in draw " + circle.selected)
 
                     ctx.strokeStyle = 'yellow'; // Set border color to yellow
                     ctx.lineWidth = 3; // Set border width to 3px
 
                 } else {
-                    ctx.strokeStyle = '#333333'; // Set border color to gray
+                    let borderColor = '#000000'
+                    if (isColorDark( circle.color )){
+                        borderColor = '#FFFFFF'
+                    }
+
+                    ctx.strokeStyle = borderColor; // Set border color to gray
                     ctx.lineWidth = circle.borderThick; // Set border width to 3px
                 }
 
@@ -181,7 +229,6 @@
                 //const endAngle = 2 * Math.PI;
 
                 fuga = ((( countOfLetters / 2 ) - circle.text.length ) /2 ) /  ( countOfLetters / 2 )  * Math.PI
-
                 //console.log( "fuga: " + fuga );
 
                 const startAngle = Math.PI + fuga + ( angleStep / 2 );
@@ -200,7 +247,14 @@
                     ctx.save();
                     ctx.translate(x, y);
                     ctx.rotate(angle + Math.PI / 2);
-                    ctx.fillStyle = 'black';
+
+                    let textColor = '#000000'
+                    if (isColorDark( circle.color )){
+                        textColor = '#FFFFFF'
+                    }
+
+                    ctx.fillStyle = textColor;
+                    //ctx.fillStyle = 'black';
                     ctx.fillText(circle.text[i], 0, 0);
                     ctx.restore();
                 }
@@ -210,6 +264,7 @@
             //console.log( "end drawing" );
         }
 
+        /* get touched position */
         function getTouchPos(canvas, event) {
 
             const rect = canvas.getBoundingClientRect();
@@ -219,57 +274,109 @@
             };
         }
 
-
-        let runStart = 0
-
+        /* handle start event */
         function handleStart( e ){
-            
+
+            // do nothing when move is active
+            if ( moved ){
+                return
+            }
+       
             //console.log( 'starting move ... ' + selectedCircle );
             const touchPos = getTouchPos(canvas, e);
             
-            let previousSelected = selectedCircle   
-            selectedCircle = circles.filter( (circle, index) => selectedCircle != circle && index >= lastSelectedIndex ).find(circle =>
-                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) )                            
-            );
+            let working = false
 
-            if ( selectedCircle === undefined ){
-
-                selectedCircle = circles.find(circle =>
-                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) )                            
-            );} 
-
-            //console.log( 'starting move TO_MOVE ... ' + selectedCircle );
-            endMove = false
-            if ( selectedCircle ) {
-                lastSelectedIndex = circles.indexOf( selectedCircle )
-                if ( lastSelectedIndex == circles.length - 1){
-                    lastSelectedIndex = 0
+            selectedCircle = circles.sort( ( a, b ) => b.id - a.id). 
+              find(circle =>
+                Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) ) && circle.selected === !selecting )
+                
+            //console.log( "selectedCircle: " + selectedCircle + "     selecting: " + selecting)
+            if ( selectedCircle !== undefined ) {
+                //console.log( "selectedCircle.selected: " + selectedCircle.selected )
+                if ( selecting && !selectedCircle.selected ){
+                    selectedCircle.selected = true
+                    //console.log("selected " + selectedCircle.id + "  true" )
+                } else if ( !selecting && selectedCircle.selected ){
+                    selectedCircle.selected = false
+                    //console.log("selected " + selectedCircle.id + "  false" )
                 }
-                //console.log( '  last selected index: ' + lastSelectedIndex );
+
+            } else {
+
+                if ( circles.find( circle => Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) ) ) !== undefined ) {
+                    selecting = !selecting
+                } else {
+                    selecting = true
+                }   
+                //console.log("switched selecting to: " + selecting)
             }
+
+            // draw circles
             drawCircles()
+
+            // 
+            endMove = false
         }
 
+        /* handling move of circles especially those they are selected */
         function handleMove( e ){
 
             //console.log( ' ... moving ...' );
-            if (selectedCircle && !endMove) {
-                const touchPos = getTouchPos(canvas, e);
-                selectedCircle.x = touchPos.x;
-                selectedCircle.y = touchPos.y;
-                drawCircles();
+
+            // when move is ending do nothing here
+            if ( endMove ){
+                //console.log( "end move + resturn" )
+                return
             }
+
+            const touchPos = getTouchPos(canvas, e);
+
+            circles.forEach( circle => {
+
+                //const touchPos = getTouchPos(canvas, e);
+                if ( circle.selected ) {
+                    circle.x = touchPos.x;
+                    circle.y = touchPos.y;
+
+                    // setting moved to be active
+                    moved = true
+                }
+            })
+
+            // draw circles by every move
+            drawCircles();   
 
         }
 
+        /* handling end of move or mouse up */
         function handleEnd(){
 
             //console.log( '... end moving' );
 
-            endMove = true
-            //selectedCircle = null;
+            // this will be done once after move was performed
+            if ( moved ) {
+                //console.log( "mouse up - after move" )
+
+                // ending move atribute switch on
+                endMove = true
+
+                circles.forEach(circle => {
+                    circle.selected = false; // Nová hodnota
+                });
+
+                /* force draw circles - typically canceling selection */
+                drawCircles()
+
+                // forcing selecting state to be able select
+                selecting = true
+
+                // moving attribute switch of
+                moved = false
+            }
 
             //drawCircles()
+
         }
 
         canvas.addEventListener('touchstart', handleStart );
@@ -280,6 +387,12 @@
 
         canvas.addEventListener('touchend', handleEnd );
         canvas.addEventListener('mouseup', handleEnd );
+
+        canvas.addEventListener('wheel', function(event) {
+            event.preventDefault();
+            let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9; // Zoom in or out
+            zoomCanvas(scaleFactor);
+        });
 
     </script>
 </body>
