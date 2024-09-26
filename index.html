@@ -20,6 +20,13 @@
         a {
             color: var(--tg-theme-link-color);
         }
+
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 7px;
+        }
+        
         #viewport {
             position: fixed;
             left: 0;
@@ -65,7 +72,6 @@
 
 <body>
     <main>
-
         <div style="font-family: monospace; font-size: 16px; color: #696969;">
             19ABD511Pravda (hranice to/ne-to)<br/>
             2778A724Dobro (rozvoj společný)<br/>
@@ -74,8 +80,9 @@
         
         <textarea id="inputData" style="width: 360px; height: 150px; overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <button onclick="parseData()">přepočítat</button>
+        <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">Nápověda</button>
         <button onclick="alert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">popis</button>
-        <canvas id="myCanvas" width="360" height="400"></canvas>
+        <canvas id="myCanvas" width='360' height="400"></canvas>
     </main>
     <div id="viewport"></div>
     <div id="viewport-params-size"></div>
@@ -92,6 +99,7 @@
         });
 
         // Show main button
+        /*
         Telegram.WebApp.MainButton.setParams({
             text: 'Main Button'
         });
@@ -99,6 +107,7 @@
             Telegram.WebApp.showAlert('Main Button was clicked')
         });	
         Telegram.WebApp.MainButton.show();
+        */
 
         // Function to call showPopup API
         function showPopup() {
@@ -117,6 +126,7 @@
         };
 
         // Function to toggle main TWA button
+        /*
         function toggleMainButton() {
             if (Telegram.WebApp.MainButton.isVisible) {
                 Telegram.WebApp.MainButton.hide();
@@ -124,6 +134,7 @@
                 Telegram.WebApp.MainButton.show();
             }
         };
+        */
 
         function setViewportData() {
             var sizeEl = document.getElementById('viewport-params-size');
