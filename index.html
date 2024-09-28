@@ -84,7 +84,7 @@
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
-        <button onclick="shareToStory()">storýčko</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <!--button onclick="shareToStory()">storýčko</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">Nápověda</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
@@ -118,6 +118,7 @@
         // Function to share to story
         function shareToStory() {
             const bublinaURL = canvas.toDataURL('image/png');
+            console.log( "bublinaUrl: " + bublinaURL )
             Telegram.WebApp.showPopup({
                 title: 'Sdílej do storýčka',
                 message: 'Chceš to opravdu sdílet do storýčka?',
@@ -650,8 +651,8 @@
     </script>
 
     <!-- Eruda is console for mobile browsers -->
-    <!--script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-    <script>eruda.init();</script-->
+    <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
+    <script>eruda.init();</script>
 </body>
 
 </html>
