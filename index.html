@@ -84,7 +84,9 @@
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
-        <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <!--button onclick="shareTS()">storýčko</button-->
+        <button onclick="textToBot()">poslat</button>
+        &nbsp;&nbsp;&nbsp;&nbsp;
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">Nápověda</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
@@ -196,8 +198,8 @@
                 formData.append('photo', blob, 'image.png');
 
                 // Define your Telegram bot token and chat ID
-                const botToken = '7268287460:AAE6C4fY6tZ1Wvdv4c_wRRLr82J69mRD3iU';
-                const chatId = '1494119591';
+                const botToken = 'BOT_TOKEN';
+                const chatId = 'CHAT_ID';
 
                 // Send the image to the Telegram bot
                 fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
@@ -230,7 +232,13 @@
             }, 'image/png');
         }
 
+        function textToBot(){
 
+            const text = document.getElementById('inputData').value
+            console.log( "definie:" + text )
+
+            Telegram.WebApp.sendData( text );
+        }
 
 
 
