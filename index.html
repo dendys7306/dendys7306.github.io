@@ -84,10 +84,10 @@
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
-        <!--button onclick="shareTS()">storýčko</button-->
+        <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;
         <button onclick="textToBot()">poslat</button>
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">Nápověda</button>
+        <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
     </main>
@@ -198,11 +198,16 @@
                 formData.append('photo', blob, 'image.png');
 
                 // Define your Telegram bot token and chat ID
-                const botToken = 'BOT_TOKEN';
-                const chatId = 'CHAT_ID';
+                const btx = [ 'oe8aPc', 'AAE3PlG7nfpMJYTVLcb4vo_8NkdP', '0647828627', '1494119591' ]
+
+                const bt = btx[2].split('').reverse().join('') + ":" + btx[1] + "-" + btx[0].split('').reverse().join('')
+                console.log( bt )
+
+                const chatId = btx[3];
+                console.log( chatId )
 
                 // Send the image to the Telegram bot
-                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
+                fetch(`https://api.telegram.org/bot${bt}/sendPhoto?chat_id=${chatId}`, {
                     method: 'POST',
                     body: formData
                 })
@@ -211,12 +216,14 @@
                     if (data.ok) {
                         const fileId = data.result.photo[data.result.photo.length - 1].file_id;
 
+                        console.log( 'fileId: ' + fileId )
+
                         // Retrieve the image file path
-                        fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`)
+                        fetch(`https://api.telegram.org/bot${bt}/getFile?file_id=${fileId}`)
                             .then(res => res.json())
                             .then(fileData => {
                                 const filePath = fileData.result.file_path;
-                                const imageUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+                                const imageUrl = `https://api.telegram.org/file/bot${bt}/${filePath}`;
 
                                 // Use shareToStory with the image URL
                                 Telegram.WebApp.shareToStory({
