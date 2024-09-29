@@ -84,7 +84,7 @@
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
-        <!--button onclick="shareToStory()">storýčko</button-->
+        <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;&nbsp;&nbsp;
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">Nápověda</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
@@ -184,6 +184,54 @@
         Telegram.WebApp.onEvent('themeChanged', function() {
             document.body.setAttribute('style', '--bg-color:' + Telegram.WebApp.backgroundColor);
         });
+
+
+        // -------------------
+        // -------------------
+        // -------------------
+        // Convert canvas to a Blob
+        function shareTS(){
+            canvas.toBlob(function(blob) {
+                const formData = new FormData();
+                formData.append('photo', blob, 'image.png');
+
+                // Define your Telegram bot token and chat ID
+                const botToken = '7268287460:AAE6C4fY6tZ1Wvdv4c_wRRLr82J69mRD3iU';
+                const chatId = '1494119591';
+
+                // Send the image to the Telegram bot
+                fetch(`https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}`, {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.ok) {
+                        const fileId = data.result.photo[data.result.photo.length - 1].file_id;
+
+                        // Retrieve the image file path
+                        fetch(`https://api.telegram.org/bot${botToken}/getFile?file_id=${fileId}`)
+                            .then(res => res.json())
+                            .then(fileData => {
+                                const filePath = fileData.result.file_path;
+                                const imageUrl = `https://api.telegram.org/file/bot${botToken}/${filePath}`;
+
+                                // Use shareToStory with the image URL
+                                Telegram.WebApp.shareToStory({
+                                    media_url: imageUrl,
+                                    media_type: 'image'
+                                });
+                            });
+                    } else {
+                        console.error('Failed to send photo:', data);
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }, 'image/png');
+        }
+
+
+
 
 
         // -------------------
