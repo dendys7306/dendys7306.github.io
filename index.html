@@ -226,10 +226,26 @@
                                 const imageUrl = `https://api.telegram.org/file/bot${bt}/${filePath}`;
 
                                 // Use shareToStory with the image URL
+                                /*
                                 Telegram.WebApp.shareToStory({
                                     media_url: imageUrl,
                                     media_type: 'image'
                                 });
+                                */
+
+                                Telegram.WebApp.shareToStory({
+                                    media: [
+                                        {
+                                            type: "photo", // or "video"
+                                            media_url: fileId, // Using fileId for the media_url parameter
+                                            // you can also optionally add other keys like 'caption'
+                                            caption: "Check out this media!"
+                                        }
+                                    ],
+                                    // Optional: When set to true, sends the story silently.
+                                    silent: false
+                                })
+
                             });
                     } else {
                         console.error('Failed to send photo:', data);
