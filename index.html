@@ -249,9 +249,11 @@
         function textToBot(){
 
             const text = document.getElementById('inputData').value
-            console.log( "definie:" + text )
+            console.log( "definice: " + text )
 
-            Telegram.WebApp.sendData( text );
+            const data = { message: text };
+            Telegram.WebApp.sendData(JSON.stringify(data));
+
         }
 
 
