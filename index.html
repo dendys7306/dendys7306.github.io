@@ -251,7 +251,7 @@
             const text = document.getElementById('inputData').value
             console.log( "definice: " + text )
 
-            const data = { message: text };
+            const data = { type: 'text', content: text };
             Telegram.WebApp.sendData(JSON.stringify(data));
 
         }
