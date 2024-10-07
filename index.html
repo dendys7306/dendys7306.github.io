@@ -101,13 +101,18 @@
             border: 1px solid rgb(60, 119, 247);      /* Optional: border for visibility */
             padding: 5px;               /* Optional: padding for spacing */
            /* background-color: rgba(224, 247, 255, 0.795);*/ /* Optional: background color for visibility */
-        }        
+        }     
+        
+        .selected {
+            background-color: hsl(216, 100%, 59%);
+            color: white;
+        }
     </style>
 </head>
 
 <body>
     <main>
-        <div style="font-family: monospace; font-size: 16px; color: #696969;">
+        <div style="font-family: monospace; font-size: 16px; color: #696969; padding: 7px">
             19ABD511Pravda (hranice to/ne-to)<br/>
             2778A724Dobro (rozvoj společný)<br/>
             35498933Krása (individuální)
@@ -117,6 +122,9 @@
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
         <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;
         <button id="createSlot">nový slot</button>&nbsp;&nbsp;
+        <button id="export"  onclick='exp()'>EXP</button>&nbsp;&nbsp;
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">IMP</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         &nbsp;&nbsp;&nbsp;&nbsp;
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
@@ -209,12 +217,15 @@
             expandEl.innerText = 'Is Expanded: ' + (Telegram.WebApp.isExpanded ? 'true' : 'false');
             */
             var expandEl = document.querySelector('#viewport-params-expand');
-            expandEl.innerText = 'Version: ' + (Telegram.WebApp.version);
+            //expandEl.innerText = 'v' + (Telegram.WebApp.version);
+            expandEl.innerText = (Telegram.WebApp.version);
         }
 
         Telegram.WebApp.setHeaderColor('secondary_bg_color');
 
         setViewportData();
+
+
         //Telegram.WebApp.onEvent('viewportChanged', setViewportData);
 
         Telegram.WebApp.onEvent('themeChanged', function() {
@@ -290,9 +301,52 @@
 
         }
 
+        // handling export
+        function exp(){
 
+            const blob = new Blob([JSON.stringify(allCircles, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'trojbublina.json';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
 
+        }
 
+        // handling import
+        document.getElementById('fileInput').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+
+                        
+                        allCircles = JSON.parse(e.target.result);
+                        
+                        const buttons = document.getElementById('slotContainer').querySelectorAll('button');
+                        buttons.forEach(button => button.remove());
+
+                        console.log('Imported JSON data:', allCircles);
+                        // You can now use jsonData in your app
+
+                        Object.keys(allCircles).forEach(key => {
+                            console.log(`Key: ${key}, Value:`, allCircles[key]);
+
+                            newSlotButton( key )
+
+                        });
+
+                    } catch (error) {
+                        console.error('Error parsing JSON:', error);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
 
         // -------------------
         // -------------------
@@ -520,35 +574,7 @@
                 for (let i = 0; i < circle.text.length; i++) {
                     //const angle = i * angleStep;
                     var angle = startAngle + (i / circle.text.length) * (endAngle - startAngle);
-
-                    /*
-                    if ( adding ) {
-                        korekce = korekce + 0.03
-                        adding = false
-                    }
-                    */
-                    /*
-                    if ( removing ){
-                        korekce = korekce - 0.02
-                        adding = false
-                    }
-                        */
-
-                    /*
-                    let charList1 = [ 'm' ]
-                    if ( charList1.includes( circle.text[i] ) ){
-                        korekce = korekce + 0.03
-                        adding = true 
-                    }
-                    let charList2 = [ 'j', 'i' ]
-                    if ( charList2.includes( circle.text[i] ) ){
-                        korekce = korekce - 0.005
-                        removing = true 
-                    }
-
-                    angle = angle + korekce
-                    */
-                                        
+                                      
                     const x = circle.x + radiusText * Math.cos(angle);
                     const y = circle.y + radiusText * Math.sin(angle);
                     ctx.save();
@@ -582,7 +608,6 @@
                 y: event.touches ? event.touches[0].clientY - rect.top : event.clientY - rect.top 
             };
         }
-
 
         let startPos = null
         let startVector = null
@@ -775,7 +800,6 @@
             return result
         }
 
-
         const handleTouchStart = (event) => {
             // Store the current timestamp when touch starts
             event.currentTarget.touchStartTime = Date.now();
@@ -798,7 +822,6 @@
                 loadSlotToCurrent( event )
             }
         };
-
 
         function storeCurrentToSlot( event ){
 
@@ -834,84 +857,60 @@
                 drawCircles()
 
             }
-        }
-        
+        }        
 
-        document.getElementById('createSlot').addEventListener('click', () => {
-            const linkContainer = document.getElementById('slotContainer');
+        function newSlotButton( slotKey ){
 
-            let newSLotKey = getSlot() 
+            if ( slotKey != null ) {
 
-            if ( newSLotKey != null ) {
+                const linkContainer = document.getElementById('slotContainer');
 
                 // Create a new anchor element
                 //const newLink = document.createElement('a');
                 const newLink = document.createElement('button');
                 newLink.href = '#'; // Set the link's destination
-                newLink.innerText = newSLotKey;
+                newLink.innerText = slotKey;
                 newLink.classList.add('dynamic-button');
 
                 // Event for click
                 newLink.addEventListener('click', (event) => {
                     event.preventDefault(); // Prevent the default anchor behavior
 
-
-                    console.log('Link clicked: ' + event.target.innerText);
+                    console.log('Link clicked: ' + event.target.innerText );
 
                     // Your logic here for click
-                    /*
-                    const linkName = event.target.text;
-                    allCircles[ linkName ] = structuredClone( circles )
-                    */
-
                     loadSlotToCurrent( event )
+
+                    /* set selected */
+                    const buttons = linkContainer.querySelectorAll('.dynamic-button');
+                    buttons.forEach(btn => btn.classList.remove('selected'));
                     
+                    // Select the clicked button
+                    newLink.classList.add('selected');
+
                 });
 
                 // Event for click
                 newLink.addEventListener('contextmenu', (event) => {
                     event.preventDefault(); // Prevent the default anchor behavior
-                    console.log('Link contextmenu');
-/*
-                    const linkName = event.target.text;
+                    console.log('Link contextmenu: ' + event.target.innerText );
 
-                    if ( allCircles[ linkName ] != null && allCircles[ linkName ] !== undefined ){
-
-                        circles = allCircles[ linkName ]
-                        
-                        // fillout textarea 
-                        inputText = document.getElementById('inputData')
-
-                        inputText.value = ''
-                        circles.forEach( circle => {
-
-                            if ( inputText.value != '' ){
-                                inputText.value = inputText.value + '\n'
-                            }
-                            inputText.value = inputText.value + circle.id + circle.radius + circle.color.substr(1) + circle.transparent + circle.borderTyp + circle.borderThick + circle.text
-
-                        })
-
-                        // draw objets 
-                        drawCircles()
-
-                    }
-                    */
                     storeCurrentToSlot( event )
                     
-
                 });
 
-/*
-                newLink.addEventListener("touchstart", handleTouchStart, false);
-                newLink.addEventListener("touchend", handleTouchEnd, false);
-                newLink.addEventListener("touchcancel", handleTouchEnd, false);
-*/
                 linkContainer.appendChild(newLink);
 
             }
-        });
+        }
 
+        document.getElementById('createSlot').addEventListener('click', () => {
+
+            let newSlotKey = getSlot() 
+
+            newSlotButton( newSlotKey )
+
+        });
 
     </script>
 
