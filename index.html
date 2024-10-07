@@ -72,6 +72,16 @@
             top: 4px;
         }
 
+
+        .dynamic-button {
+            width: 15px;
+            height: 25px;
+            /*background-color: lightblue;*/
+            margin: 2px;
+            border: none;
+            cursor: pointer;
+        }
+
         /* Basic styles for your link */
         .dynamic-link {
             /*display: block;*/
@@ -84,13 +94,13 @@
         }
 
         .slot-div {
-            width: 360px;                /* Set the width of the div */
+            width: auto;                /* Set the width of the div */
             height: auto;                /* Allow the height to adjust based on content */
             word-wrap: break-word;       /* This ensures long words break to the next line if necessary */
             overflow-wrap: break-word;   /* Alternative property for better compatibility */
             border: 1px solid rgb(60, 119, 247);      /* Optional: border for visibility */
             padding: 5px;               /* Optional: padding for spacing */
-            background-color: rgba(224, 247, 255, 0.795); /* Optional: background color for visibility */
+           /* background-color: rgba(224, 247, 255, 0.795);*/ /* Optional: background color for visibility */
         }        
     </style>
 </head>
@@ -780,22 +790,28 @@
             if (duration >= 1000 && duration <= 2000) { // 1-2 seconds
                 console.log(`Touch duration on ${event.currentTarget.id} is between 1 and 2 seconds.`);
                 // Handle the 1-2 second touch event here
+                storeCurrentToSlot( event )
+
             } else if (duration > 3000) { // More than 3 seconds
                 console.log(`Touch duration on ${event.currentTarget.id} is more than 3 seconds.`);
                 // Handle the more than 3 seconds touch event here
+                loadSlotToCurrent( event )
             }
         };
 
 
         function storeCurrentToSlot( event ){
 
-            const linkName = event.target.text;
+            //const linkName = event.target.text;
+            const linkName = event.currentTarget.innerText
+
             allCircles[ linkName ] = structuredClone( circles )
         }
 
         function loadSlotToCurrent( event ){
 
-            const linkName = event.target.text;
+            //const linkName = event.target.text;
+            const linkName = event.currentTarget.innerText
 
             if ( allCircles[ linkName ] != null && allCircles[ linkName ] !== undefined ){
 
@@ -829,10 +845,11 @@
             if ( newSLotKey != null ) {
 
                 // Create a new anchor element
-                const newLink = document.createElement('a');
+                //const newLink = document.createElement('a');
+                const newLink = document.createElement('button');
                 newLink.href = '#'; // Set the link's destination
                 newLink.innerText = newSLotKey;
-                newLink.classList.add('dynamic-link');
+                newLink.classList.add('dynamic-button');
 
                 // Event for touch down
                 newLink.addEventListener('touchstart', () => {
