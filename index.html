@@ -74,8 +74,8 @@
 
 
         .dynamic-button {
-            width: 15px;
-            height: 25px;
+            width: 32px;
+            height: 32px;
             /*background-color: lightblue;*/
             margin: 2px;
             border: none;
@@ -862,7 +862,7 @@
                     event.preventDefault(); // Prevent the default anchor behavior
 
 
-                    console.log('Link clicked: ' + event.target.text);
+                    console.log('Link clicked: ' + event.target.innerText);
 
                     // Your logic here for click
                     /*
@@ -908,11 +908,11 @@
 
                 });
 
-
+/*
                 newLink.addEventListener("touchstart", handleTouchStart, false);
                 newLink.addEventListener("touchend", handleTouchEnd, false);
                 newLink.addEventListener("touchcancel", handleTouchEnd, false);
-
+*/
                 linkContainer.appendChild(newLink);
 
             }
