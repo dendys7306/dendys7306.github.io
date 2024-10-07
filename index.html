@@ -71,6 +71,27 @@
         #viewport-params-expand {
             top: 4px;
         }
+
+        /* Basic styles for your link */
+        .dynamic-link {
+            /*display: block;*/
+            margin: 5px 0;
+            color: blue;
+            text-decoration: underline;
+            font-size: medium;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+
+        .slot-div {
+            width: 360px;                /* Set the width of the div */
+            height: auto;                /* Allow the height to adjust based on content */
+            word-wrap: break-word;       /* This ensures long words break to the next line if necessary */
+            overflow-wrap: break-word;   /* Alternative property for better compatibility */
+            border: 1px solid rgb(60, 119, 247);      /* Optional: border for visibility */
+            padding: 5px;               /* Optional: padding for spacing */
+            background-color: rgba(224, 247, 255, 0.795); /* Optional: background color for visibility */
+        }        
     </style>
 </head>
 
@@ -85,11 +106,14 @@
         <p>
         <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
         <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;
+        <button id="createSlot">nový slot</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         &nbsp;&nbsp;&nbsp;&nbsp;
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
+
+        <div id="slotContainer" class="slot-div"></div>
     </main>
     <div id="viewport"></div>
     <div id="viewport-params-size"></div>
@@ -258,6 +282,8 @@
 
 
 
+
+
         // -------------------
         // -------------------
         // -------------------
@@ -265,6 +291,8 @@
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
         let circles = []
+
+        let allCircles = {}
 
         // text general properties
         ctx.textAlign = "center";
@@ -719,6 +747,160 @@
             let scaleFactor = event.deltaY < 0 ? 1.1 : 0.9; // Zoom in or out
             zoomCanvas(scaleFactor);
         });
+
+
+        function getSlot(){
+
+            slots = 'abcdefghijklmnopqrstuvwxyz'.split( '' )
+
+            result = ""
+            slots.forEach( slot => {
+
+                if ( !allCircles.hasOwnProperty(slot) && result == "" ){
+                    result = slot                    
+                }
+
+            })
+
+            return result
+        }
+
+
+        const handleTouchStart = (event) => {
+            // Store the current timestamp when touch starts
+            event.currentTarget.touchStartTime = Date.now();
+        };
+
+        const handleTouchEnd = (event) => {
+            // Calculate the duration of the touch
+            const touchEndTime = Date.now();
+            const duration = touchEndTime - event.currentTarget.touchStartTime; // Duration in milliseconds
+            
+            // Determine the action based on the duration
+            if (duration >= 1000 && duration <= 2000) { // 1-2 seconds
+                console.log(`Touch duration on ${event.currentTarget.id} is between 1 and 2 seconds.`);
+                // Handle the 1-2 second touch event here
+            } else if (duration > 3000) { // More than 3 seconds
+                console.log(`Touch duration on ${event.currentTarget.id} is more than 3 seconds.`);
+                // Handle the more than 3 seconds touch event here
+            }
+        };
+
+
+        function storeCurrentToSlot( event ){
+
+            const linkName = event.target.text;
+            allCircles[ linkName ] = structuredClone( circles )
+        }
+
+        function loadSlotToCurrent( event ){
+
+            const linkName = event.target.text;
+
+            if ( allCircles[ linkName ] != null && allCircles[ linkName ] !== undefined ){
+
+                circles = allCircles[ linkName ]
+                
+                /* fillout textarea */
+                inputText = document.getElementById('inputData')
+
+                inputText.value = ''
+                circles.forEach( circle => {
+
+                    if ( inputText.value != '' ){
+                        inputText.value = inputText.value + '\n'
+                    }
+                    inputText.value = inputText.value + circle.id + circle.radius + circle.color.substr(1) + circle.transparent + circle.borderTyp + circle.borderThick + circle.text
+
+                })
+
+                /* draw objets */
+                drawCircles()
+
+            }
+        }
+        
+
+        document.getElementById('createSlot').addEventListener('click', () => {
+            const linkContainer = document.getElementById('slotContainer');
+
+            let newSLotKey = getSlot() 
+
+            if ( newSLotKey != null ) {
+
+                // Create a new anchor element
+                const newLink = document.createElement('a');
+                newLink.href = '#'; // Set the link's destination
+                newLink.innerText = newSLotKey;
+                newLink.classList.add('dynamic-link');
+
+                // Event for touch down
+                newLink.addEventListener('touchstart', () => {
+                    console.log('Link touched down');
+                    // Your logic here for touch down
+                });
+
+                // Event for click
+                newLink.addEventListener('click', (event) => {
+                    event.preventDefault(); // Prevent the default anchor behavior
+
+
+                    console.log('Link clicked: ' + event.target.text);
+
+                    // Your logic here for click
+                    /*
+                    const linkName = event.target.text;
+                    allCircles[ linkName ] = structuredClone( circles )
+                    */
+
+                    storeCurrentToSlot( event )
+
+                });
+
+                // Event for click
+                newLink.addEventListener('contextmenu', (event) => {
+                    event.preventDefault(); // Prevent the default anchor behavior
+                    console.log('Link contextmenu');
+/*
+                    const linkName = event.target.text;
+
+                    if ( allCircles[ linkName ] != null && allCircles[ linkName ] !== undefined ){
+
+                        circles = allCircles[ linkName ]
+                        
+                        // fillout textarea 
+                        inputText = document.getElementById('inputData')
+
+                        inputText.value = ''
+                        circles.forEach( circle => {
+
+                            if ( inputText.value != '' ){
+                                inputText.value = inputText.value + '\n'
+                            }
+                            inputText.value = inputText.value + circle.id + circle.radius + circle.color.substr(1) + circle.transparent + circle.borderTyp + circle.borderThick + circle.text
+
+                        })
+
+                        // draw objets 
+                        drawCircles()
+
+                    }
+                    */
+
+                    loadSlotToCurrent( event )
+
+                });
+
+
+                newLink.addEventListener("touchstart", handleTouchStart, false);
+                newLink.addEventListener("touchend", handleTouchEnd, false);
+                newLink.addEventListener("touchcancel", handleTouchEnd, false);
+
+                linkContainer.appendChild(newLink);
+
+            }
+        });
+
 
     </script>
 
