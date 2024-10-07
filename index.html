@@ -112,21 +112,20 @@
 
 <body>
     <main>
-        <div style="font-family: monospace; font-size: 16px; color: #696969; padding: 7px">
+        <!--div style="font-family: monospace; font-size: 16px; color: #696969; padding: 7px">
             19ABD511Pravda (hranice to/ne-to)<br/>
             2778A724Dobro (rozvoj společný)<br/>
             35498933Krása (individuální)
-        </div>
+        </div-->
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
-        <button onclick="parseData()">přepočítat</button>&nbsp;&nbsp;
-        <button onclick="shareTS()">storýčko</button>&nbsp;&nbsp;
-        <button id="createSlot">nový slot</button>&nbsp;&nbsp;
+        <button onclick="parseData()">display</button>&nbsp;&nbsp;
+        <button onclick="shareTS()">story</button>&nbsp;&nbsp;
+        <button id="createSlot">new slot</button>&nbsp;&nbsp;
         <button id="export"  onclick='exp()'>EXP</button>&nbsp;&nbsp;
         <input type="file" id="fileInput" accept=".json" style="display: none;">
         <button onclick="document.getElementById('fileInput').click()">IMP</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
-        &nbsp;&nbsp;&nbsp;&nbsp;
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
