@@ -122,9 +122,10 @@
         <button onclick="parseData()">display</button>&nbsp;&nbsp;
         <button onclick="shareTS()">story</button>&nbsp;&nbsp;
         <button id="createSlot">new slot</button>&nbsp;&nbsp;
-        <button id="export"  onclick='exp()'>EXP</button>&nbsp;&nbsp;
-        <input type="file" id="fileInput" accept=".json" style="display: none;">
-        <button onclick="document.getElementById('fileInput').click()">IMP</button>&nbsp;&nbsp;
+        <button id="export" onclick='saveJsonToFile()'>EXP</button>&nbsp;&nbsp;
+        <button id="import" onclick='loadJsonFromFile()'>IMP</button>&nbsp;&nbsp;
+        <!--input type="file" id="fileInput" accept=".json" style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">IMP</button-->&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         </p>
@@ -232,6 +233,8 @@
         });
 
 
+        let allCircles = {}
+
         // -------------------
         // -------------------
         // -------------------
@@ -300,6 +303,32 @@
 
         }
 
+
+        async function saveJsonToFile() {
+            try {
+                // Request a file handle
+                const handle = await window.showSaveFilePicker({
+                suggestedName: 'trojbublina',
+                types: [{
+                    description: 'JSON Files',
+                    accept: {'application/json': ['.json']},
+                }],
+                });
+
+                // Create a writable stream
+                const writableStream = await handle.createWritable();
+
+                // Write the JSON data to the file
+                await writableStream.write(JSON.stringify(allCircles));
+
+                // Close the file and write the contents to disk
+                await writableStream.close();
+            } catch (error) {
+                console.error('Error saving file:', error);
+            }
+        }
+
+
         // handling export
         function exp(){
 
@@ -315,7 +344,42 @@
 
         }
 
+        async function loadJsonFromFile() {
+            try {
+                // Open file picker
+                const [fileHandle] = await window.showOpenFilePicker({
+                    types: [{
+                        description: 'JSON Files',
+                        accept: {'application/json': ['.json']},
+                    }],
+                    multiple: false
+                });
+
+                // Get file
+                const file = await fileHandle.getFile();
+                const contents = await file.text();
+
+                // Parse JSON data
+                allCircles = JSON.parse(contents);
+                console.log(allCircles);
+                // Process the JSON data as needed
+
+                Object.keys(allCircles).forEach(key => {
+                            console.log(`Key: ${key}, Value:`, allCircles[key]);
+
+                            newSlotButton( key )
+
+                        });
+
+            } catch (error) {
+                console.error('Error loading file:', error);
+            }
+        };
+
+
+
         // handling import
+        /*
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -346,6 +410,7 @@
                 reader.readAsText(file);
             }
         });
+        */
 
         // -------------------
         // -------------------
@@ -355,7 +420,7 @@
         const ctx = canvas.getContext('2d');
         let circles = []
 
-        let allCircles = {}
+        //let allCircles = {}
 
         // text general properties
         ctx.textAlign = "center";
