@@ -456,7 +456,32 @@
             
         }
 
-        function loadFromCloud(){
+        async function loadFromCloud(){
+
+            // if somthing interesting is in clipboard load it
+            try {
+                // Read from clipboard
+                const text = await navigator.clipboard.readText();
+                
+                const checkCircles = JSON.parse( text )
+
+                console.add( 'checkCircles: ' + checkCirclees )
+
+                if ( checkCircles.getKeys[0] == 'a'  ){
+
+                    console.add( 'Found the "a" key... load from clipboard otherwise load from cloud' )
+
+                    allCircles = checkCircles
+                    return
+                }
+
+                // Display the read text
+                document.getElementById('output').innerText = text;
+
+            } catch (err) {
+                console.error('Failed to read clipboard contents: ', err);
+            }            
+
 
             Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
                 if (err) {
@@ -1034,6 +1059,9 @@
 
         function newSlotButton( slotKey ){
 
+
+
+
             if ( slotKey != null ) {
 
                 //const linkContainer = document.getElementById('slotContainer');
@@ -1108,13 +1136,38 @@
             //const button = getButtonByText('linkContainer', slotKey)
         }
 
+
+        function findButtonsInContainer(buttonText) {
+
+            // Select all buttons within the container
+            const buttons = linkContainer.querySelectorAll('button, input[type="button"]');
+
+            // Filter buttons by innerText
+            const matchingButtons = Array.from(buttons).filter(button => {
+                return button.innerText.trim() === buttonText;
+            });
+
+            return matchingButtons;
+        }      
+
         document.getElementById('createSlot').addEventListener('click', () => {
 
             let newSlotKey = getSlot() 
 
-            newSlotButton( newSlotKey )
+            // check if not exists
+            const buttons = findButtonsInContainer(newSlotKey);
 
-            selectButton( newSlotKey )
+            if (buttons.length > 0) {
+                console.log('Found buttons:', buttons);
+            } else {
+                console.log('No matching buttons found');
+
+                newSlotButton( newSlotKey )
+
+                selectButton( newSlotKey )
+
+            }
+
 
         });
 
