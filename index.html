@@ -122,10 +122,10 @@
         <button onclick="parseData()">display</button>&nbsp;&nbsp;
         <button onclick="shareTS()">story</button>&nbsp;&nbsp;
         <button id="createSlot">new slot</button>&nbsp;&nbsp;
-        <button id="export" onclick='saveJsonToFile()'>EXP</button>&nbsp;&nbsp;
-        <button id="import" onclick='loadJsonFromFile()'>IMP</button>&nbsp;&nbsp;
-        <!--input type="file" id="fileInput" accept=".json" style="display: none;">
-        <button onclick="document.getElementById('fileInput').click()">IMP</button-->&nbsp;&nbsp;
+        <button id="export" onclick='exp()'>EXP</button>&nbsp;&nbsp;
+        <!--button id="import" onclick='loadJsonFromFile()'>IMP</button-->
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">IMP</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         </p>
@@ -141,6 +141,18 @@
 
         // Init TWA
         Telegram.WebApp.ready();
+
+        if ( Telegram.WebApp.version > 7 ){
+            Telegram.WebApp.requestWriteAccess(function(allowed) {
+                    if (allowed) {
+                        el.nextElementSibling.innerHTML = '(Access granted)'
+                        el.nextElementSibling.className = 'ok'
+                    } else {
+                        el.nextElementSibling.innerHTML = '(User declined this request)'
+                        el.nextElementSibling.className = 'err'
+                    }
+                })
+        }
 
         // Event occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
         Telegram.WebApp.onEvent('themeChanged', function() {
@@ -379,7 +391,6 @@
 
 
         // handling import
-        /*
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -410,7 +421,6 @@
                 reader.readAsText(file);
             }
         });
-        */
 
         // -------------------
         // -------------------
