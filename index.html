@@ -384,6 +384,8 @@
         /* parsing data */
         function parseData() {
             
+            circles = []
+
             // Get the input data
             const inputData = document.getElementById('inputData').value;
             
@@ -392,53 +394,63 @@
             
             const regex = /^(.)(.)(.{3})(.)(.)(.)(.*)$/;
 
-            // Iterate over each line and parse the data
-            lines.forEach(line => {
 
-                const match = line.match(regex);
+            try {
 
-                //console.log( "preparing line with id: " + parseInt(match[1]) )
+                // Iterate over each line and parse the data
+                lines.forEach(line => {
 
-                // entry with given id exists
-                const index = circles.findIndex(circles => circles.id === parseInt(match[1]));
+                    const match = line.match(regex);
 
-                if (index !== -1) {
+                    //console.log( "preparing line with id: " + parseInt(match[1]) )
 
-                    circleUpdates = {
+                    // entry with given id exists
+                    const index = circles.findIndex(circles => circles.id === parseInt(match[1]));
 
-                        radius: parseInt(match[2]),            // 1x - radius  
-                        color: '#' + match[3].trim(),          // 3x - color in hex
-                        transparent : parseInt(match[4]),      // 1x - transparent
-                        borderTyp : match[5],                  // 1x - border typ (1 dotted, 2 lined, other normal)
-                        borderThick : match[6],                // 1x - border thickness
-                        text : match[7]                        // Nx - text
+                    if (index !== -1) {
 
+                        circleUpdates = {
+
+                            radius: parseInt(match[2]),            // 1x - radius  
+                            color: '#' + match[3].trim(),          // 3x - color in hex
+                            transparent : parseInt(match[4]),      // 1x - transparent
+                            borderTyp : match[5],                  // 1x - border typ (1 dotted, 2 lined, other normal)
+                            borderThick : match[6],                // 1x - border thickness
+                            text : match[7]                        // Nx - text
+
+                        }
+
+                        // Update the object at the found index
+                        circles[index] = {
+                            ...circles[index],
+                            ...circleUpdates
+                        };
+
+                    } else {
+
+                        // Create a circle object and add it to the array
+                        const circle = {
+                            x: canvas.width / 2,
+                            y: canvas.height / 2, 
+                            selected : false,
+                            id: parseInt(match[1]),                // 1x - id  
+                            radius: parseInt(match[2]),            // 1x - radius  
+                            color: '#' + match[3].trim(),          // 3x - color in hex
+                            transparent : parseInt(match[4]),      // 1x - transparent
+                            borderTyp : match[5],                  // 1x - border typ (1 dotted, 2 lined, other normal)
+                            borderThick : match[6],                // 1x - border thickness
+                            text : match[7]                        // Nx - text
+                        };
+                        circles.push(circle);
                     }
+                });
 
-                    // Update the object at the found index
-                    circles[index] = {
-                        ...circles[index],
-                        ...circleUpdates
-                    };
+            } catch(error) {
 
-                } else {
+                circle = []
+                console.error('Error by reading trojbublina definition:', error);
 
-                    // Create a circle object and add it to the array
-                    const circle = {
-                        x: canvas.width / 2,
-                        y: canvas.height / 2, 
-                        selected : false,
-                        id: parseInt(match[1]),                // 1x - id  
-                        radius: parseInt(match[2]),            // 1x - radius  
-                        color: '#' + match[3].trim(),          // 3x - color in hex
-                        transparent : parseInt(match[4]),      // 1x - transparent
-                        borderTyp : match[5],                  // 1x - border typ (1 dotted, 2 lined, other normal)
-                        borderThick : match[6],                // 1x - border thickness
-                        text : match[7]                        // Nx - text
-                    };
-                    circles.push(circle);
-                }
-            });
+            }
             
             //console.log(circles);
             //circles.sort( (a,b) => a.id - b.id );
@@ -855,14 +867,24 @@
                 /* draw objets */
                 drawCircles()
 
+            } else {
+
+                // clearing structures
+                document.getElementById('inputData').value = ""
+                circles = []
+                drawCircles()
+
             }
+
         }        
+
+        const linkContainer = document.getElementById('slotContainer');
 
         function newSlotButton( slotKey ){
 
             if ( slotKey != null ) {
 
-                const linkContainer = document.getElementById('slotContainer');
+                //const linkContainer = document.getElementById('slotContainer');
 
                 // Create a new anchor element
                 //const newLink = document.createElement('a');
@@ -880,12 +902,15 @@
                     // Your logic here for click
                     loadSlotToCurrent( event )
 
-                    /* set selected */
+                    selectButton( event.target.innerText )
+                    /*
+                    // set selected 
                     const buttons = linkContainer.querySelectorAll('.dynamic-button');
                     buttons.forEach(btn => btn.classList.remove('selected'));
                     
                     // Select the clicked button
                     newLink.classList.add('selected');
+                    */
 
                 });
 
@@ -900,7 +925,35 @@
 
                 linkContainer.appendChild(newLink);
 
+                // clearing structures
+                document.getElementById('inputData').value = ""
+                circles = []
+                drawCircles()
+
             }
+        }
+
+
+        function selectButton( slotKey ){
+            
+            /* set selected */
+            const buttons = linkContainer.querySelectorAll('.dynamic-button');
+            buttons.forEach(btn => {
+                
+                if ( btn.innerText == slotKey ) { 
+
+                    btn.classList.add('selected');
+
+                } else {
+
+                    btn.classList.remove('selected')
+
+                }
+
+            });
+                    
+            // Select the clicked button
+            //const button = getButtonByText('linkContainer', slotKey)
         }
 
         document.getElementById('createSlot').addEventListener('click', () => {
@@ -908,6 +961,8 @@
             let newSlotKey = getSlot() 
 
             newSlotButton( newSlotKey )
+
+            selectButton( newSlotKey )
 
         });
 
