@@ -433,14 +433,14 @@
             navigator.clipboard.writeText(JSON.stringify(allCircles))
                 .then(() => {
                     console.log('All Circles copied to clipboard');
-                    Telegram.WebApp.showAlert("All Circles copied to clipboard.");
+                    //Telegram.WebApp.showAlert("All Circles copied to clipboard.");
                 })
                 .catch(err => {
                     console.error('Failed to copy: ', err);
-                    Telegram.WebApp.showAlert("Failed to copy text.");
+                    //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
-
+/*
             const key = 'trojbublina'
             const value = JSON.stringify( allCircles )
             Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
@@ -452,6 +452,8 @@
                     }
                 }
             });
+
+            */
         }
 
         function loadFromCloud(){
@@ -469,21 +471,27 @@
                                 const cloudStorageItems = {};
                                 for (let i = 0; i < keys.length; i++) {
                                     const key = keys[i];
+                                    
+                                    console.log( 'key: ' + key + '  value: ' + values[key])
+                                    /*
                                     cloudStorageItems[key] = values[key];
 
                                     if ( key == 'trojbublina' ){
                                         console.log( 'loading from Cloud' )
                                         allCircles = values[key]
+                                        console.log( 'loaded allcircles: ' + allCircles )
                                     }
+                                        */
 
                                 }
-                                
+                     /*           
                                 Object.keys(allCircles).forEach(key => {
                                 
                                     console.log(`Key: ${key}, Value:`, allCircles[key]);
                                     newSlotButton( key )
 
                                 });
+                                */
                             }
                         });
                     }
