@@ -128,6 +128,7 @@
         <button onclick="document.getElementById('fileInput').click()">IMP</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
+        <br/><a href="javascript:;" onclick="return requestWriteAccess(this);">Request write access</a>
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
 
@@ -142,16 +143,18 @@
         // Init TWA
         Telegram.WebApp.ready();
 
-        if ( Telegram.WebApp.version > 7 ){
-            Telegram.WebApp.requestWriteAccess(function(allowed) {
+        function requestWriteAccess(el) {
+            if ( Telegram.WebApp.version > 7 ){
+                Telegram.WebApp.requestWriteAccess(function(allowed) {
                     if (allowed) {
                         el.nextElementSibling.innerHTML = '(Access granted)'
-                        el.nextElementSibling.className = 'ok'
+                        //el.nextElementSibling.className = 'ok'
                     } else {
                         el.nextElementSibling.innerHTML = '(User declined this request)'
-                        el.nextElementSibling.className = 'err'
+                        //el.nextElementSibling.className = 'err'
                     }
                 })
+            }
         }
 
         // Event occurs whenever theme settings are changed in the user's Telegram app (including switching to night mode).
