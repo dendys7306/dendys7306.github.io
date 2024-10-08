@@ -121,11 +121,11 @@
         <p>
         <button onclick="parseData()">display</button>&nbsp;&nbsp;
         <button onclick="shareTS()">story</button>&nbsp;&nbsp;
-        <button id="createSlot">new slot</button>&nbsp;&nbsp;
+        <button id="createSlot">slot</button>&nbsp;&nbsp;
         <button id="export" onclick='saveToCloud()'>EXP</button>&nbsp;&nbsp;
         <button id="import" onclick='loadFromCloud()'>IMP</button>&nbsp;&nbsp;
-        <!--input type="file" id="fileInput" accept=".json" style="display: none;">
-        <button onclick="document.getElementById('fileInput').click()">IMP</button-->&nbsp;&nbsp;
+        <input type="file" id="fileInput" accept=".json" style="display: none;">
+        <button onclick="document.getElementById('fileInput').click()">FILE</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
         <!--br/><a href="javascript:;" onclick="return requestWriteAccess(this);">Request write access</a-->
@@ -394,7 +394,6 @@
 
 
         // handling import
-        /*
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             if (file) {
@@ -425,7 +424,7 @@
                 reader.readAsText(file);
             }
         });
-*/
+
 
         function saveToCloud(){
 
