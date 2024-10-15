@@ -427,7 +427,7 @@
 
 
         // Function to purge all objects from Cloud Storage
-        function purgeCloudStorage() {
+        async function purgeCloudStorage() {
             Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
                 if (err) {
                     Telegram.WebApp.showAlert('Error: ' + err);
@@ -453,7 +453,7 @@
             });
         }
 
-        function saveToCloud(){
+        async function saveToCloud(){
 
             // copy to clipboard
             navigator.clipboard.writeText(JSON.stringify(allCircles))
@@ -466,7 +466,7 @@
                     //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
-            purgeCloudStorage()
+            await purgeCloudStorage()
 
             count = 0
             Object.keys(allCircles).forEach(key => {
