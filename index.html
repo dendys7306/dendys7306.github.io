@@ -426,6 +426,26 @@
         });
 
 
+        // Function to purge all objects from Cloud Storage
+        async function purgeCloudStorage() {
+            try {
+                // Retrieve the list of stored objects
+                const objects = await Telegram.WebApp.CloudStorage.list();
+
+                if (objects && objects.length) {
+                    for (const object of objects) {
+                        await Telegram.WebApp.CloudStorage.remove(object.id);
+                        console.log(`Removed object with ID: ${object.id}`);
+                    }
+                    console.log('All objects have been removed.');
+                } else {
+                    console.log('No objects found in Cloud Storage.');
+                }
+            } catch (error) {
+                console.error('An error occurred during the purge operation:', error);
+            }
+        }
+
         function saveToCloud(){
 
             // copy to clipboard
@@ -439,7 +459,29 @@
                     //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
+            purgeCloudStorage()
 
+            Object.keys(allCircles).forEach(key => {
+                            
+                console.log(`trying to save ... Key: ${key}, Value:`, allCircles[key]);
+                
+                const value = JSON.stringify( allCircles[key] )
+                /*
+                Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
+                    if (err) {
+                        Telegram.WebApp.showAlert('Error: ' + err);
+                    } else {
+                        if (saved) {
+                            Telegram.WebApp.showAlert('Saved to Cloud OK.');
+                        }
+                    }
+                });
+                */
+
+            });
+
+
+            /*
             const key = 'trojbublina'
             const value = JSON.stringify( allCircles )
             Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
@@ -451,7 +493,7 @@
                     }
                 }
             });
-
+            */
             
         }
 
@@ -501,7 +543,7 @@
 
                                     if ( key == 'trojbublina' ){
                                         console.log( 'loading from Cloud' )
-                                        allCircles = JSON.parse( values[key] )
+                                        allCircles[key] = JSON.parse( values[key] )
                                         console.log( 'loaded allcircles: ' + allCircles )
                                     }
 
@@ -560,7 +602,7 @@
         /* parsing data */
         function parseData() {
             
-            circles = []
+            //circles = []
 
             // Get the input data
             const inputData = document.getElementById('inputData').value;
@@ -595,7 +637,7 @@
                             text : match[7]                        // Nx - text
 
                         }
-
+                        console.log( "A circle x y: " + circles[index].x + " " + circles[index].y )
                         // Update the object at the found index
                         circles[index] = {
                             ...circles[index],
