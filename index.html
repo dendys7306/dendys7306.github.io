@@ -486,34 +486,39 @@
                 } else {
                     if (removed) {
                         console.log( 'removed ALL items' )
+
+
+                        console.log('BEFORE seting keys')
+                        //Telegram.WebApp.showAlert('Removed All OK.');
+                        count = 0
+                        Object.keys(allCircles).forEach(key => {
+                                        
+                            console.log(`trying to save ... Key: ${key}, Value:`, allCircles[key]);
+                            count++
+                            const value = JSON.stringify( allCircles[key] )
+
+                            Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
+                                if (err) {
+                                    Telegram.WebApp.showAlert('Error: ' + err);
+                                } else {
+                                    /*
+                                    if (saved) {
+                                        Telegram.WebApp.showAlert('Saved to Cloud OK.');
+                                    }
+                                    */
+                                }
+                            });
+
+                        });
+
+                        Telegram.WebApp.showAlert('Saving to cloud data: ' + count );
+
+
+
                     }
                 }
             });
 
-            console.log('BEFORE seting keys')
-            //Telegram.WebApp.showAlert('Removed All OK.');
-            count = 0
-            Object.keys(allCircles).forEach(key => {
-                            
-                console.log(`trying to save ... Key: ${key}, Value:`, allCircles[key]);
-                count++
-                const value = JSON.stringify( allCircles[key] )
-
-                Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
-                    if (err) {
-                        Telegram.WebApp.showAlert('Error: ' + err);
-                    } else {
-                        /*
-                        if (saved) {
-                            Telegram.WebApp.showAlert('Saved to Cloud OK.');
-                        }
-                        */
-                    }
-                });
-
-            });
-
-            Telegram.WebApp.showAlert('Saving to cloud data: ' + count );
 
 
             /*
