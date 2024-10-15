@@ -467,32 +467,54 @@
                 });
 
 
-            console.log( 'BEFORE purge' )
-            await purgeCloudStorage()
-            console.log( 'AFTER purge' )
+            Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
+                if (err) {
+                    Telegram.WebApp.showAlert('Error: ' + err);
+                } else {
+                    if (keys.length > 0) {
 
-            count = 0
-            Object.keys(allCircles).forEach(key => {
-                            
-                console.log(`trying to save ... Key: ${key}, Value:`, allCircles[key]);
-                count++
-                const value = JSON.stringify( allCircles[key] )
+                        Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
+                            if (err) {
+                                Telegram.WebApp.showAlert('Error: ' + err);
+                            } else {
+                                console.log( 'removed ALL items' )
+                                if (removed) {
+                                    
+                                    //Telegram.WebApp.showAlert('Removed All OK.');
+                                    count = 0
+                                    Object.keys(allCircles).forEach(key => {
+                                                    
+                                        console.log(`trying to save ... Key: ${key}, Value:`, allCircles[key]);
+                                        count++
+                                        const value = JSON.stringify( allCircles[key] )
 
-                Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
-                    if (err) {
-                        Telegram.WebApp.showAlert('Error: ' + err);
-                    } else {
-                        /*
-                        if (saved) {
-                            Telegram.WebApp.showAlert('Saved to Cloud OK.');
-                        }
-                        */
+                                        Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
+                                            if (err) {
+                                                Telegram.WebApp.showAlert('Error: ' + err);
+                                            } else {
+                                                /*
+                                                if (saved) {
+                                                    Telegram.WebApp.showAlert('Saved to Cloud OK.');
+                                                }
+                                                */
+                                            }
+                                        });
+
+                                    });
+
+                                    Telegram.WebApp.showAlert('Saving to cloud data: ' + count );
+
+                                }
+                            }
+                        });
+
+
                     }
-                });
-
+                }
             });
 
-            Telegram.WebApp.showAlert('Saved to cloud data: ' + count );
+
+
 
             /*
             const key = 'trojbublina'
@@ -574,7 +596,7 @@
 
                                 });
 
-                                Telegram.WebApp.showAlert('Loaded from cloud data: ' + count );
+                                Telegram.WebApp.showAlert('Loading from cloud data: ' + count );
                                 
                             }
                         });
