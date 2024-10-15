@@ -466,7 +466,10 @@
                     //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
+
+            console.log( 'BEFORE purge' )
             await purgeCloudStorage()
+            console.log( 'AFTER purge' )
 
             count = 0
             Object.keys(allCircles).forEach(key => {
