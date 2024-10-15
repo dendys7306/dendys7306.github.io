@@ -466,7 +466,7 @@
                     //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
-            keysList
+            let keysList = []
             console.log('BEFORE getting keys')
             await Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
                 if (err) {
@@ -480,7 +480,7 @@
             });
 
             console.log('BEFORE removing keys')
-            await Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
+            await Telegram.WebApp.CloudStorage.removeItems(keysList, function(err, removed) {
                 if (err) {
                     Telegram.WebApp.showAlert('Error: ' + err);
                 } else {
