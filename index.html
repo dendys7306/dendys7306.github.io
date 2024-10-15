@@ -427,25 +427,30 @@
 
 
         // Function to purge all objects from Cloud Storage
-        async function purgeCloudStorage() {
-            try {
-                console.log(`Trying to remove objects`);
-                // Retrieve the list of stored objects
-                const objects = await Telegram.WebApp.CloudStorage.list();
-                console.log(`Getting list of objects: ` + objects );
-
-                if (objects && objects.length) {
-                    for (const object of objects) {
-                        await Telegram.WebApp.CloudStorage.remove(object.id);
-                        console.log(`Removed object with ID: ${object.id}`);
-                    }
-                    console.log('All objects have been removed.');
+        function purgeCloudStorage() {
+            Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
+                if (err) {
+                    Telegram.WebApp.showAlert('Error: ' + err);
                 } else {
-                    console.log('No objects found in Cloud Storage.');
+                    if (keys.length > 0) {
+
+                        Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
+                            if (err) {
+                                Telegram.WebApp.showAlert('Error: ' + err);
+                            } else {
+                                console.log( 'removed ALL items' )
+                                /*
+                                if (removed) {
+                                    Telegram.WebApp.showAlert('Removed All OK.');
+                                }
+                                */
+                            }
+                        });
+
+
+                    }
                 }
-            } catch (error) {
-                console.error('An error occurred during the purge operation:', error);
-            }
+            });
         }
 
         function saveToCloud(){
@@ -474,9 +479,11 @@
                     if (err) {
                         Telegram.WebApp.showAlert('Error: ' + err);
                     } else {
+                        /*
                         if (saved) {
                             Telegram.WebApp.showAlert('Saved to Cloud OK.');
                         }
+                        */
                     }
                 });
 
