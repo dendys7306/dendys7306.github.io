@@ -466,27 +466,31 @@
                     //Telegram.WebApp.showAlert("Failed to copy text.");
                 });
 
-
+            keysList
+            console.log('BEFORE getting keys')
             await Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
                 if (err) {
                     Telegram.WebApp.showAlert('Error: ' + err);
                 } else {
                     if (keys.length > 0) {
 
-                        Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
-                            if (err) {
-                                Telegram.WebApp.showAlert('Error: ' + err);
-                            } else {
-                                if (removed) {
-                                    console.log( 'removed ALL items' )
-                                }
-                            }
-                        });
+                        keysList = keys
                     }
                 }
             });
 
+            console.log('BEFORE removing keys')
+            await Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
+                if (err) {
+                    Telegram.WebApp.showAlert('Error: ' + err);
+                } else {
+                    if (removed) {
+                        console.log( 'removed ALL items' )
+                    }
+                }
+            });
 
+            console.log('BEFORE seting keys')
             //Telegram.WebApp.showAlert('Removed All OK.');
             count = 0
             Object.keys(allCircles).forEach(key => {
