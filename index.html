@@ -112,11 +112,6 @@
 
 <body>
     <main>
-        <!--div style="font-family: monospace; font-size: 16px; color: #696969; padding: 7px">
-            19ABD511Pravda (hranice to/ne-to)<br/>
-            2778A724Dobro (rozvoj společný)<br/>
-            35498933Krása (individuální)
-        </div-->
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
         <button onclick="parseData()">display</button>&nbsp;&nbsp;
@@ -240,7 +235,6 @@
 
         setViewportData();
 
-
         //Telegram.WebApp.onEvent('viewportChanged', setViewportData);
 
         Telegram.WebApp.onEvent('themeChanged', function() {
@@ -290,13 +284,6 @@
                                 console.log( 'imageUrl: ' + imageUrl )
 
                                 // Use shareToStory with the image URL
-                                /*
-                                Telegram.WebApp.shareToStory({
-                                    media_url: imageUrl,
-                                    media_type: 'image'
-                                });
-                                */
-
                                 Telegram.WebApp.shareToStory(imageUrl)
 
                             });
@@ -426,33 +413,6 @@
         });
 
 
-        // Function to purge all objects from Cloud Storage
-        async function purgeCloudStorage() {
-            Telegram.WebApp.CloudStorage.getKeys(function(err, keys) {
-                if (err) {
-                    Telegram.WebApp.showAlert('Error: ' + err);
-                } else {
-                    if (keys.length > 0) {
-
-                        Telegram.WebApp.CloudStorage.removeItems(keys, function(err, removed) {
-                            if (err) {
-                                Telegram.WebApp.showAlert('Error: ' + err);
-                            } else {
-                                console.log( 'removed ALL items' )
-                                /*
-                                if (removed) {
-                                    Telegram.WebApp.showAlert('Removed All OK.');
-                                }
-                                */
-                            }
-                        });
-
-
-                    }
-                }
-            });
-        }
-
         async function saveToCloud(){
 
             // copy to clipboard
@@ -519,22 +479,6 @@
                 }
             });
 
-
-
-            /*
-            const key = 'trojbublina'
-            const value = JSON.stringify( allCircles )
-            Telegram.WebApp.CloudStorage.setItem(key, value, function(err, saved) {
-                if (err) {
-                    Telegram.WebApp.showAlert('Error: ' + err);
-                } else {
-                    if (saved) {
-                        Telegram.WebApp.showAlert('Saved to Cloud OK.');
-                    }
-                }
-            });
-            */
-            
         }
 
         async function loadFromCloud(){
@@ -615,12 +559,9 @@
         // -------------------
         // -------------------
         // -------------------
-        
         const canvas = document.getElementById('myCanvas');
         const ctx = canvas.getContext('2d');
         let circles = []
-
-        //let allCircles = {}
 
         // text general properties
         ctx.textAlign = "center";
@@ -649,8 +590,6 @@
         /* parsing data */
         function parseData() {
             
-            //circles = []
-
             // Get the input data
             const inputData = document.getElementById('inputData').value;
             
@@ -658,7 +597,6 @@
             const lines = inputData.split('\n');
             
             const regex = /^(.)(.)(.{3})(.)(.)(.)(.*)$/;
-
 
             try {
 
@@ -717,10 +655,6 @@
 
             }
             
-            //console.log(circles);
-            //circles.sort( (a,b) => a.id - b.id );
-            //console.log(circles);
-
             drawCircles();
         }
 
@@ -779,9 +713,9 @@
         /* draw circles function */ 
         function drawCircles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+
             // order ascending - may be do it better way not to sort every draw
             circles.sort( (a, b) => a.id - b.id ).forEach(circle => {               
-            //circles.forEach(circle => {               
                 ctx.beginPath();
 
                 radiusCircle = getRadiusInPixel(circle.radius)
@@ -864,7 +798,6 @@
                     }
 
                     ctx.fillStyle = textColor;
-                    //ctx.fillStyle = 'black';
 
                     ctx.fillText(circle.text[i], 0, 0);
                     ctx.restore();
@@ -951,7 +884,6 @@
             // draw circles
             drawCircles()
 
-            // 
             endMove = false
         }
 
@@ -974,9 +906,7 @@
                 return 
             }
 
-
             const touchPos = getTouchPos(canvas, e);
-            
 
             /* check for significant move */
             threshold = 10
@@ -1147,9 +1077,6 @@
 
         function newSlotButton( slotKey ){
 
-
-
-
             if ( slotKey != null ) {
 
                 //const linkContainer = document.getElementById('slotContainer');
@@ -1171,14 +1098,6 @@
                     loadSlotToCurrent( event )
 
                     selectButton( event.target.innerText )
-                    /*
-                    // set selected 
-                    const buttons = linkContainer.querySelectorAll('.dynamic-button');
-                    buttons.forEach(btn => btn.classList.remove('selected'));
-                    
-                    // Select the clicked button
-                    newLink.classList.add('selected');
-                    */
 
                 });
 
@@ -1220,8 +1139,6 @@
 
             });
                     
-            // Select the clicked button
-            //const button = getButtonByText('linkContainer', slotKey)
         }
 
 
@@ -1242,6 +1159,12 @@
 
             let newSlotKey = getSlot() 
 
+            if ( newSlotKey == "" ){
+
+                Telegram.WebApp.showAlert( 'There is no free slot, recycle one existing.' );
+                return 
+            }
+
             // check if not exists
             const buttons = findButtonsInContainer(newSlotKey);
 
@@ -1255,7 +1178,6 @@
                 selectButton( newSlotKey )
 
             }
-
 
         });
 
