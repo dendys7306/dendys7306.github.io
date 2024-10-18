@@ -592,23 +592,36 @@
             
             // Get the input data
             const inputData = document.getElementById('inputData').value;
-            
+
+            // replace empty lines
+            let modifiedData = inputData.replace( /\n{2,}/g, '\n');
+
+            modifiedData = modifiedData.replace( /^\n{1,}/g, '');
+            // remove last new line sequence
+            modifiedData = modifiedData.replace( /\n{1,}$/g, '');
+
             // Split the input data into lines
-            const lines = inputData.split('\n');
+            const lines = modifiedData.split('\n')
             
-            const regex = /^(.)(.)(.{3})(.)(.)(.)(.*)$/;
+            const regex = /^(.)(.)(.{3})(.)(.)(.)(.*)$/
 
             try {
+
+                const indexes = []
 
                 // Iterate over each line and parse the data
                 lines.forEach(line => {
 
-                    const match = line.match(regex);
+                    const match = line.match(regex)
 
                     //console.log( "preparing line with id: " + parseInt(match[1]) )
 
                     // entry with given id exists
-                    const index = circles.findIndex(circles => circles.id === parseInt(match[1]));
+                    const id = parseInt(match[1])
+                    const index = circles.findIndex(circles => circles.id === id);
+
+                    // array of indexes
+                    indexes.push( id ) 
 
                     if (index !== -1) {
 
@@ -648,6 +661,13 @@
                     }
                 });
 
+
+                // delete already nonexistent indexes
+                console.log( 'indexes: ' + indexes )
+
+                // removing deleted lines
+                circles = circles.filter(circle => indexes.includes( circle.id ));
+
             } catch(error) {
 
                 circle = []
@@ -657,6 +677,17 @@
             
             drawCircles();
         }
+
+
+        /*
+        function removeCircleById(circles, idToRemove) {
+            const index = circles.findIndex(circle => circle.id === idToRemove);
+            if (index !== -1) {
+                circles.splice(index, 1); // Remove the circle from the original array
+            }
+        }
+        */
+
 
         /* count letter ofr the whole circle depending on radius (1-9) */
         function countOfLetter( radius ){
