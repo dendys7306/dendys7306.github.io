@@ -600,6 +600,16 @@
             // remove last new line sequence
             modifiedData = modifiedData.replace( /\n{1,}$/g, '');
 
+            // empty input
+            if ( modifiedData.length == 0 ){
+
+                circles = []
+                
+                drawCircles()
+
+                return
+            }
+
             // Split the input data into lines
             const lines = modifiedData.split('\n')
             
