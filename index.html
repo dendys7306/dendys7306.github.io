@@ -768,7 +768,7 @@
 
             // order ascending - may be do it better way not to sort every draw
             //circles.sort( (a, b) => a.id - b.id ).forEach(circle => {           
-            circles.sort( (a, b) => getIdAsNumber( a.id ) - getIdAsNumber( b.id ) ).forEach(circle => {                   
+            circles.sort( (a, b) => getIdAsNumber( a.id.toString() ) - getIdAsNumber( b.id.toString() ) ).forEach(circle => {                   
                 ctx.beginPath();
 
                 radiusCircle = getRadiusInPixel(circle.radius)
@@ -938,7 +938,7 @@
             let working = false
 
             //selectedCircle = circles.sort( ( a, b ) => b.id - a.id). 
-            selectedCircle = circles.sort( ( a, b ) => getIdAsNumber( b.id ) - getIdAsNumber( a.id ) ). 
+            selectedCircle = circles.sort( ( a, b ) => getIdAsNumber( b.id.toString() ) - getIdAsNumber( a.id.toString() ) ). 
               find(circle =>
                 Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) ) && circle.selected === !selecting )
                 
