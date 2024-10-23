@@ -647,7 +647,7 @@
                             text : match[7]                        // Nx - text
 
                         }
-                        console.log( "A circle x y: " + circles[index].x + " " + circles[index].y )
+                        //console.log( "A circle x y: " + circles[index].x + " " + circles[index].y )
                         // Update the object at the found index
                         circles[index] = {
                             ...circles[index],
@@ -675,7 +675,7 @@
 
 
                 // delete already nonexistent indexes
-                console.log( 'indexes: ' + indexes )
+                //console.log( 'indexes: ' + indexes )
 
                 // removing deleted lines
                 circles = circles.filter(circle => indexes.includes( circle.id ));
@@ -750,12 +750,12 @@
             let result
 
             if (/[a-zA-Z]/.test(chars[0])) {
-                console.log( chars[0] + " " + chars[0].charCodeAt(0) );
+                //console.log( chars[0] + " " + chars[0].charCodeAt(0) );
                 result = ( chars[0].charCodeAt(0) * 10 ) + parseInt( chars[1] ) 
             } else {
                 result = parseInt( chars[0] )
             }
-            console.log( "result: " + result );
+            //console.log( "result: " + result );
 
             return result
 
