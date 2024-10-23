@@ -473,8 +473,6 @@
 
                         Telegram.WebApp.showAlert('Saving to cloud data: ' + count );
 
-
-
                     }
                 }
             });
@@ -604,7 +602,7 @@
             if ( modifiedData.length == 0 ){
 
                 circles = []
-                
+
                 drawCircles()
 
                 return
@@ -613,7 +611,7 @@
             // Split the input data into lines
             const lines = modifiedData.split('\n')
             
-            const regex = /^(.)(.)(.{3})(.)(.)(.)(.*)$/
+            const regex = /^([a-zA-Z]\d|\d)(.)(.{3})(.)(.)(.)(.*)$/
 
             try {
 
@@ -627,7 +625,11 @@
                     //console.log( "preparing line with id: " + parseInt(match[1]) )
 
                     // entry with given id exists
-                    const id = parseInt(match[1])
+                    //const id = parseInt(match[1])
+                    const id = match[1]
+
+                    getIdAsNumber( id )
+
                     const index = circles.findIndex(circles => circles.id === id);
 
                     // array of indexes
@@ -659,7 +661,7 @@
                             x: canvas.width / 2,
                             y: canvas.height / 2, 
                             selected : false,
-                            id: parseInt(match[1]),                // 1x - id  
+                            id: match[1],                // 1x - id  
                             radius: parseInt(match[2]),            // 1x - radius  
                             color: '#' + match[3].trim(),          // 3x - color in hex
                             transparent : parseInt(match[4]),      // 1x - transparent
@@ -687,17 +689,6 @@
             
             drawCircles();
         }
-
-
-        /*
-        function removeCircleById(circles, idToRemove) {
-            const index = circles.findIndex(circle => circle.id === idToRemove);
-            if (index !== -1) {
-                circles.splice(index, 1); // Remove the circle from the original array
-            }
-        }
-        */
-
 
         /* count letter ofr the whole circle depending on radius (1-9) */
         function countOfLetter( radius ){
@@ -751,12 +742,33 @@
         let moved = false
         let selecting = true
 
+
+        function getIdAsNumber( id ){
+
+            chars = id.split('')
+            
+            let result
+
+            if (/[a-zA-Z]/.test(chars[0])) {
+                console.log( chars[0] + " " + chars[0].charCodeAt(0) );
+                result = ( chars[0].charCodeAt(0) * 10 ) + parseInt( chars[1] ) 
+            } else {
+                result = parseInt( chars[0] )
+            }
+            console.log( "result: " + result );
+
+            return result
+
+        }
+
+
         /* draw circles function */ 
         function drawCircles() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
             // order ascending - may be do it better way not to sort every draw
-            circles.sort( (a, b) => a.id - b.id ).forEach(circle => {               
+            //circles.sort( (a, b) => a.id - b.id ).forEach(circle => {           
+            circles.sort( (a, b) => getIdAsNumber( a.id ) - getIdAsNumber( b.id ) ).forEach(circle => {                   
                 ctx.beginPath();
 
                 radiusCircle = getRadiusInPixel(circle.radius)
@@ -849,6 +861,41 @@
             //console.log( "end drawing" );
         }
 
+        // moving example
+        // --------------
+        let x = 50; // initial x position
+        let y = 50; // initial y position
+        const radius = 20; // radius of the circle
+        let dx = 1; // change in x (speed in the x direction)
+        let dy = 1; // change in y (speed in the y direction)        
+
+        function drawCircle() {
+            // Clear the canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Draw the circle
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fillStyle = "blue"; // circle color
+            ctx.fill();
+            ctx.closePath();
+
+            // Update the position
+            x += dx;
+            y += dy;
+
+            // Check for collision with walls
+            if (x + radius > canvas.width || x - radius < 0) {
+                dx = -dx; // reverse direction on x collision
+            }
+            if (y + radius > canvas.height || y - radius < 0) {
+                dy = -dy; // reverse direction on y collision
+            }
+
+            requestAnimationFrame(drawCircle); // call the function again for animation
+        }
+
+        //drawCircle(); 
+
         /* get touched position */
         function getTouchPos(canvas, event) {
 
@@ -890,7 +937,8 @@
 
             let working = false
 
-            selectedCircle = circles.sort( ( a, b ) => b.id - a.id). 
+            //selectedCircle = circles.sort( ( a, b ) => b.id - a.id). 
+            selectedCircle = circles.sort( ( a, b ) => getIdAsNumber( b.id ) - getIdAsNumber( a.id ) ). 
               find(circle =>
                 Math.hypot(circle.x - touchPos.x, circle.y - touchPos.y) < ( getRadiusInPixel( circle.radius ) ) && circle.selected === !selecting )
                 
@@ -1011,8 +1059,6 @@
                 startVector = null
             }
 
-            //drawCircles()
-
         }
 
         canvas.addEventListener('touchstart', handleStart );
@@ -1100,17 +1146,16 @@
 
                 })
 
-                /* draw objets */
-                drawCircles()
-
             } else {
 
                 // clearing structures
                 document.getElementById('inputData').value = ""
                 circles = []
-                drawCircles()
 
             }
+
+            /* draw objets */
+            drawCircles()
 
         }        
 
@@ -1156,6 +1201,7 @@
                 // clearing structures
                 document.getElementById('inputData').value = ""
                 circles = []
+
                 drawCircles()
 
             }
