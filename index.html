@@ -128,7 +128,7 @@
         <!--button onclick="textToBot()">poslat</button-->
         <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>&nbsp;&nbsp;
         <!--br/><a href="javascript:;" onclick="return requestWriteAccess(this);">Request write access</a-->
-        <button id="downloadBtn">PNG</button>
+        <!--button id="downloadBtn">PNG</button-->
         <!--a href="javascript:;" onclick="canvas.toDataURL();" download="trojbublina.png">link</a-->
         </div>
         <canvas id="myCanvas" width="360" height="400"></canvas>
@@ -254,8 +254,12 @@
         // -------------------
         // -------------------
         // Convert canvas to a Blob
-        function shareTS(){
-            canvas.toBlob(function(blob) {
+        async function shareTS(){
+
+                const dataUrl = canvas.toDataURL('image/png');
+                const blob = await (await fetch(dataUrl)).blob();
+
+            //anvas.toBlob(function(blob) {
                 const formData = new FormData();
                 formData.append('photo', blob, 'image.png');
 
@@ -298,7 +302,9 @@
                     }
                 })
                 .catch(error => console.error('Error:', error));
-            }, 'image/png');
+
+
+            //}, 'image/png');
         }
 
         function textToBot(){
@@ -1278,14 +1284,14 @@
 
         });
 
-
+/*
         document.getElementById('downloadBtn').addEventListener('click', function() {
             const link = document.createElement('a');
             link.download = 'trojbublina.png'; // Set the name for the downloaded file
             link.href = canvas.toDataURL('image/png'); // Convert the canvas to Data URL in PNG format
             link.click(); // Simulate a click to trigger the download
         });        
-
+*/
 
     </script>
 
