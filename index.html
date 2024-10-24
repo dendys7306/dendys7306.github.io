@@ -114,7 +114,7 @@
     <main>
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
         <p>
-        <button onclick="parseData()">display</button>&nbsp;&nbsp;
+        <button onclick="parseData()">displ</button>&nbsp;&nbsp;
         <button onclick="shareTS()">story</button>&nbsp;&nbsp;
         <button id="createSlot">slot</button>&nbsp;&nbsp;
         <button id="export" onclick='saveToCloud()'>EXP</button>&nbsp;&nbsp;
@@ -122,8 +122,10 @@
         <input type="file" id="fileInput" accept=".json" style="display: none;">
         <button onclick="document.getElementById('fileInput').click()">FILE</button>&nbsp;&nbsp;
         <!--button onclick="textToBot()">poslat</button-->
-        <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>
+        <button onclick="Telegram.WebApp.showAlert('1x idéčko \n1x velikost (1-9)\n3x barva v hex (AB8)\n1x transparentnost (1-9)\n1x border type (1 ..., 2 --, other normal)\n1x border thickness (1-9)\ntext');">?</button>&nbsp;&nbsp;
         <!--br/><a href="javascript:;" onclick="return requestWriteAccess(this);">Request write access</a-->
+        <button id="downloadBtn">PNG</button>
+        <!--a href="javascript:;" onclick="canvas.toDataURL();" download="trojbublina.png">link</a-->
         </p>
         <canvas id="myCanvas" width="360" height="400"></canvas>
 
@@ -630,15 +632,19 @@
 
                     getIdAsNumber( id )
 
-                    const index = circles.findIndex(circles => circles.id === id);
+                    const index = circles.findIndex(circles => circles.id.toString() === id.toString() );
 
                     // array of indexes
                     indexes.push( id ) 
+
+                    //console.log( circles )
 
                     if (index !== -1) {
 
                         circleUpdates = {
 
+                            //
+                            id: match[1],                      // 1x - id (force update to string)
                             radius: parseInt(match[2]),            // 1x - radius  
                             color: '#' + match[3].trim(),          // 3x - color in hex
                             transparent : parseInt(match[4]),      // 1x - transparent
@@ -1267,6 +1273,15 @@
             }
 
         });
+
+
+        document.getElementById('downloadBtn').addEventListener('click', function() {
+            const link = document.createElement('a');
+            link.download = 'trojbublina.png'; // Set the name for the downloaded file
+            link.href = canvas.toDataURL('image/png'); // Convert the canvas to Data URL in PNG format
+            link.click(); // Simulate a click to trigger the download
+        });        
+
 
     </script>
 
