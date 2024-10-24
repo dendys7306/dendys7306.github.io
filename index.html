@@ -30,6 +30,10 @@
         canvas {
             border: 1px solid rgb(69, 69, 69);
         }
+
+        button {
+            padding: 1px;
+        }
         
         #viewport {
             position: fixed;
@@ -113,7 +117,7 @@
 <body>
     <main>
         <textarea id="inputData" style="overflow: auto; font-family: monospace; font-size: 16px;" rows="7" cols="80" placeholder="17ABD932Pravda (hranice to/ne-to)"></textarea> 
-        <p>
+        <div style="padding:3px;">
         <button onclick="parseData()">disp</button>&nbsp;&nbsp;
         <button onclick="shareTS()">stor</button>&nbsp;&nbsp;
         <button id="createSlot">slot</button>&nbsp;&nbsp;
@@ -126,7 +130,7 @@
         <!--br/><a href="javascript:;" onclick="return requestWriteAccess(this);">Request write access</a-->
         <button id="downloadBtn">PNG</button>
         <!--a href="javascript:;" onclick="canvas.toDataURL();" download="trojbublina.png">link</a-->
-        </p>
+        </div>
         <canvas id="myCanvas" width="360" height="400"></canvas>
 
         <div id="slotContainer" class="slot-div"></div>
